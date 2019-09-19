@@ -25,7 +25,10 @@ SECRET_KEY = 'n)me*4j(*g6^t)181)6&tb*072246q231@3m#&y_lhb4+z_z^_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -64,6 +67,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'string_if_invalid': 'INVALID_VALUE',
         },
     },
 ]
