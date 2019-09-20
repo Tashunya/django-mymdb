@@ -130,4 +130,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = 'core:MovieList'
+LOGIN_URL = 'user:login'
 LOGOUT_REDIRECT_URL = 'user:login'
