@@ -19,14 +19,14 @@ class MovieDetail(DetailView):
     """
     creates view for one movie
     """
-    queryset = (Movie.objects.all_with_related_persons())
+    queryset = (Movie.objects.all_with_related_persons_and_score())
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
             vote = Vote.objects.get_vote_on_unsaved_blank_vote(
                 movie=self.object,
-                user = self.request.user
+                user=self.request.user
             )
             if vote.id:
                 vote_form_url = reverse(
