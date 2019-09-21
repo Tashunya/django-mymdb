@@ -1,3 +1,5 @@
+import django
+from django.core.cache import cache
 from django.urls import reverse
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
@@ -5,19 +7,40 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from .models import Movie, Person, Vote
 from .forms import VoteForm, MovieImageForm
+from .mixins import CachePageVaryOnCookieMixin
 
 
-class MovieList(ListView):
+class MovieList(CachePageVaryOnCookieMixin, ListView):
     """
     creates view for all the movies
     """
     model = Movie
     paginate_by = 10
+    #
+    # def get_context_data(self, **kwargs):
+    #     ctx = super(MovieList, self).get_context_data(**kwargs)
+    #     page = ctx['page_obj']
+    #     paginator = ctx['paginator']
+    #     ctx['page_is_first'] = (page.number == 1)
+    #     ctx['page_is_last'] = (page.number == paginator.num_pages)
+    #     return ctx
 
 
 class TopMovies(ListView):
     template_name = 'core/top_movies_list.html'
-    queryset = Movie.objects.top_movies(limit=10)
+    # queryset = Movie.objects.top_movies(limit=10)
+
+    def get_queryset(self):
+        limit = 10
+        key = 'top_movies_%s' % limit
+        cached_qs = cache.get(key)
+        if cached_qs:
+            same_django = cached_qs._django_version == django.get_version()
+            if same_django:
+                return cached_qs
+        qs = Movie.objects.top_movies(limit=limit)
+        cache.set(key, qs)
+        return qs
 
 
 class MovieDetail(DetailView):
@@ -103,7 +126,7 @@ class UpdateVote(LoginRequiredMixin, UpdateView):
         vote = super().get_object(queryset)
         user = self.request.user
         if vote.user != user:
-            raise PermissionDenied('cannot change another user vote')
+            raise PermissionDenied('cannot change another users vote')
         return vote
 
     def get_success_url(self):
@@ -112,8 +135,7 @@ class UpdateVote(LoginRequiredMixin, UpdateView):
 
     def render_to_response(self, context, **response_kwargs):
         movie_id = context['object'].id
-        movie_detail_url = reverse(
-            'core:MovieDetail', kwargs={'pk': movie_id})
+        movie_detail_url = reverse('core:MovieDetail', kwargs={'pk': movie_id})
         return redirect(to=movie_detail_url)
 
 
