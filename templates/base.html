@@ -28,6 +28,10 @@
             <div class="navbar-brand">MyMDB</div>
             <a class="nav-link" href="{% url 'core:MovieList' %}">Movies</a>
             <a class="nav-link" href="#">{{ user }}</a>
+            <a class="nav-link"
+               href="{% url 'core:TopMovies' %}">
+                Top 10 Movies
+            </a>
         </nav>
     </div>
 </div>

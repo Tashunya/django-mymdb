@@ -15,6 +15,11 @@ class MovieList(ListView):
     paginate_by = 10
 
 
+class TopMovies(ListView):
+    template_name = 'core/top_movies_list.html'
+    queryset = Movie.objects.top_movies(limit=10)
+
+
 class MovieDetail(DetailView):
     """
     creates view for one movie
