@@ -16,14 +16,14 @@ class MovieList(CachePageVaryOnCookieMixin, ListView):
     """
     model = Movie
     paginate_by = 10
-    #
-    # def get_context_data(self, **kwargs):
-    #     ctx = super(MovieList, self).get_context_data(**kwargs)
-    #     page = ctx['page_obj']
-    #     paginator = ctx['paginator']
-    #     ctx['page_is_first'] = (page.number == 1)
-    #     ctx['page_is_last'] = (page.number == paginator.num_pages)
-    #     return ctx
+
+    def get_context_data(self, **kwargs):
+        ctx = super(MovieList, self).get_context_data(**kwargs)
+        page = ctx['page_obj']
+        paginator = ctx['paginator']
+        ctx['page_is_first'] = (page.number == 1)
+        ctx['page_is_last'] = (page.number == paginator.num_pages)
+        return ctx
 
 
 class TopMovies(ListView):
@@ -47,7 +47,7 @@ class MovieDetail(DetailView):
     """
     creates view for one movie
     """
-    queryset = (Movie.objects.all_with_related_persons_and_score())
+    queryset = Movie.objects.all_with_related_persons_and_score()
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -60,9 +60,7 @@ class MovieDetail(DetailView):
             if vote.id:
                 vote_form_url = reverse(
                     'core:UpdateVote',
-                    kwargs={
-                        'movie_id': vote.movie.id,
-                        'pk': vote.id})
+                    kwargs={'movie_id': vote.movie.id, 'pk': vote.id})
             else:
                 vote_form_url = (reverse(
                     'core:CreateVote',
