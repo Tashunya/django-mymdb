@@ -1,8 +1,9 @@
-../venv/
+venv/
 .idea/
 /__pycache__/
-/core/__pycache__/
-/core/migrations/__pycache__/
-/user/__pycache__/
-/config/__pycache__
+django/core/__pycache__/
+django/core/migrations/__pycache__/
+django/user/__pycache__/
+django/user/migrations/__pycache__/
+django/config/__pycache__/
 .env
