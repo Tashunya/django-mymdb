@@ -20,10 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'n)me*4j(*g6^t)181)6&tb*072246q231@3m#&y_lhb4+z_z^_'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -34,7 +34,6 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'core',
     'user', # user must go before admin
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -82,11 +82,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mymdb',
-        'USER': 'mymdb',
-        'PASSWORD': 'development',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
     }
 }
 
@@ -128,20 +123,37 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'gathered_static_files')
 
 LOGIN_REDIRECT_URL = 'core:MovieList'
 LOGIN_URL = 'user:login'
 LOGOUT_REDIRECT_URL = 'user:login'
 
 MEDIA_URL = '/uploaded/'
-MEDIA_ROOT = os.path.join(BASE_DIR, '../media_root')
 
-CASHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'default-locmemcache',
-        'TIMEOUT': 5 # seconds
-    }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'main': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['main'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'django.db.backends': {
+            'handlers': [],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+        },
+        'core': {
+            'handlers': ['main'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO')
+        }
+    },
 }
 
 CSRF_USE_SESSIONS = True
